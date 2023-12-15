@@ -1,8 +1,8 @@
 // Font
 #let font = (
-  main: "Source Sans 3",
-  mono: "Source Sans 3",
-  cjk: "Source Han Sans CN",
+  main: "Source Han Sans SC",
+  mono: "Source Han Sans SC",
+  cjk: "Source Han Sans SC",
 )
 
 // Icons
@@ -15,14 +15,14 @@
   // Title color
   themeColor: rgb(0, 0, 0),
   // Control paper margins
-  top: .8cm,
-  bottom: .4cm,
-  left: 1.4cm,
-  right: 1.4cm,
+  top: 1cm,
+  bottom: 1cm,
+  left: 2cm,
+  right: 2cm,
   // Profile photo
   photograph: "images/profile.jpg",
-  photographWidth: 5.2em,
-  photographHeight: 7.8em,
+  photographWidth: 6em,
+  photographHeight: 9em,
   gutterWidth: 0em,
   header,
   body,
@@ -38,8 +38,8 @@
   set text(font: (font.main, font.cjk), size: size, weight: "regular", lang: "zh")
 
   // Heading styles
-  show heading.where(level: 1): set text(1.3em)
-  show heading.where(level: 2): set text(themeColor, 1.1em)
+  show heading.where(level: 1): set text(themeColor, 1.2em)
+  show heading.where(level: 2): set text(themeColor, 0.9em)
 
   // Add a horizontal line under level 2 headings
   show heading.where(level: 2): it => stack(
@@ -58,7 +58,7 @@
 
   // Body style
   set par(justify: true)
-  show par: set block(spacing: 0.6em)
+  show par: set block(spacing: 0.5em)
 
   // Header and photograph
   grid(
@@ -79,7 +79,7 @@
 // Personal information
 #let info(color: black, ..infos) = {
   v(0.5em)
-  set text(font: (font.mono, font.cjk), fill: color, size: 12pt)
+  set text(font: (font.mono, font.cjk), fill: color, size: 11pt)
   infos.pos().map(dir => {
     box({
       if "icon" in dir {
@@ -102,7 +102,7 @@
 // Education background
 #let education(school, major, degree, dateRange) = {
   grid(
-    columns: (1fr, 2%, auto, 10%, auto, 35%, auto),
+    columns: (1fr, 2%, auto, 15%, auto, 30%, auto),
     gutter: (0em),
     school,
     "",
@@ -117,7 +117,7 @@
 // Work experience
 #let workExperience(company, jobTitle, dateRange) = {
   grid(
-    columns: (1fr, 2%, auto, 35%, auto),
+    columns: (1fr, 2%, auto, 30%, auto),
     gutter: (0em),
     company,
     "",
