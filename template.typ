@@ -1,151 +1,125 @@
-// Font
-#let font = (
-  main: "Source Han Sans SC",
-  mono: "Source Han Sans SC",
-  cjk: "Source Han Sans SC",
-)
+#let font_size = 11pt
+#let theme_color = black
 
-// Icons
-#let icon(path) = box(baseline: 0.125em, height: 1em, width: 1em, image(path))
-
-// Resume
-#let resume(
-  // Base font size
-  size: 8.5pt,
-  // Title color
-  themeColor: rgb(0, 0, 0),
-  // Control paper margins
-  top: 1cm,
-  bottom: 1cm,
-  left: 2cm,
-  right: 2cm,
-  // Profile photo
-  photograph: "images/profile.jpg",
-  photographWidth: 6em,
-  photographHeight: 9em,
-  gutterWidth: 0em,
-  header,
-  body,
-) = {
+#let conf(doc) = {
   // Set page margins
-  set page(
-    paper: "a4",
-    numbering: none,
-    margin: (top: top, bottom: bottom, left: left, right: right),
-  )
-
+  set page(paper: "a4", margin: (x: 1.1cm, y: 1.3cm))
   // Set base font
-  set text(font: (font.main, font.cjk), size: size, weight: "regular", lang: "zh")
-
-  // Heading styles
-  show heading.where(level: 1): set text(themeColor, 1.2em)
-  show heading.where(level: 2): set text(themeColor, 0.9em)
-
-  // Add a horizontal line under level 2 headings
-  show heading.where(level: 2): it => stack(
-    v(0em),
-    it,
-    v(0.25em),
-    line(length: 100%, stroke: 0.05em + themeColor),
-    v(0.05em),
+  set text(
+    font: ("Source Sans 3", "Source Han Sans SC"),
+    size: font_size,
+    weight: "regular",
+    lang: "zh",
+    region: "CN",
+    ligatures: false,
+    number-type: "lining",
   )
-
-  // Change bullet list icons
-  set list(tight: true)
-
   // Link color
-  show link: set text(fill: themeColor)
+  show link: set text(fill: theme_color)
+  // Add a horizontal line under level 2 headings
+  show heading.where(level: 2): it => text(fill: theme_color, [
+    #{ it.body }
+    #v(-7pt)
+    #line(length: 100%, stroke: 1pt + theme_color)
+  ])
 
+  show heading.where(level: 1): it => block(width: 100%)[
+    #set text(size: 1.5em, weight: "bold")
+    #upper(it.body)
+    #v(2pt)
+  ]
   // Body style
   set par(justify: true)
-  show par: set block(spacing: 0.5em)
-
-  // Header and photograph
-  grid(
-    columns: (auto, 1fr, auto),
-    gutter: (gutterWidth, 0em),
-    header,
-    if (photograph != "") {
-      align(
-        image(photograph, width: photographWidth, height: photographHeight),
-        end,
-      )
-    },
-  )
-
-  body
+  doc
 }
 
-// Personal information
-#let info(color: black, ..infos) = {
-  v(0.5em)
-  set text(font: (font.mono, font.cjk), fill: color, size: 11pt)
-  infos.pos().map(dir => {
-    box({
-      if "icon" in dir {
-        if (type(dir.icon) == "string") {
-          icon(dir.icon)
+// Icons
+#let icon(path) = box(baseline: 0.2em, height: 1.25em, image(path))
+
+// Contact information
+#let contact_information(..it) = {
+  set text(size: 1em, weight: "medium")
+  it.pos().map(item => {
+    box(baseline: 30%, {
+      if "icon" in item {
+        if (type(item.icon) == "string") {
+          icon(item.icon)
         } else {
-          dir.icon
+          item.icon
         }
       }
       h(0.2em)
-      if "link" in dir {
-        link(dir.link, dir.content)
+      if "link" in item {
+        link(item.link, item.content)
       } else {
-        dir.content
+        item.content
       }
     })
-  }).join("\n")
+  }).join(h(1em) + "|" + h(1em))
+}
+
+//personal information
+#let personal_information(contact_information, photograph)={
+  // Contact information and photograph
+  grid(
+    columns: (auto, 1fr, auto),
+    gutter: (auto, auto),
+    contact_information,
+    if (photograph != "") {
+      align(end, image(photograph, width: 2.5cm, height: 3.75cm))
+    },
+  )
 }
 
 // Education background
-#let education(school, major, degree, dateRange) = {
+#let education(school, major, degree, date_range) = {
   grid(
     columns: (1fr, 2%, auto, 15%, auto, 30%, auto),
-    gutter: (0em),
+    column-gutter: (0em),
     school,
     "",
     major,
     "",
     degree,
     "",
-    align(dateRange, right),
+    align(right, text(gray, date_range)),
   )
 }
 
 // Work experience
-#let workExperience(company, jobTitle, dateRange) = {
+#let work(company, job_name, date_range, job_content) = {
   grid(
     columns: (1fr, 2%, auto, 30%, auto),
-    gutter: (0em),
+    column-gutter: (0em),
     company,
     "",
-    jobTitle,
+    job_name,
     "",
-    align(dateRange, right),
+    align(right, text(gray, date_range)),
   )
+  { job_content }
 }
 
 // Project experience
-#let projectExperience(projectName, dateRange) = {
+#let project(project_name, date_range, technology, project_content, project_feature) = {
   grid(
     columns: (1fr, auto, auto),
-    gutter: (0em),
-    align(left, projectName),
-    align(right, dateRange),
+    column-gutter: (0em),
+    align(left, project_name),
+    align(right, text(gray, date_range)),
   )
+  { project_content }
+  { project_feature }
 }
 
-// Technology names
-#let technologyNames(bodies) = {
-  let cell = rect.with(
-    radius: 5pt,
-    inset: (top: 4pt, bottom: 4pt, left: 5pt, right: 5pt),
-    fill: rgb(243, 244, 244),
-  )
-  let boxes = for body in bodies {
-    (box(cell(body)),)
-  }
-  { boxes.join(" ") }
+// Technology
+#let technology(..it) = {
+  it.pos().map(item => {
+    box(
+      fill: luma(235),
+      inset: (x: 3pt, y: 0pt),
+      outset: (y: 3pt),
+      radius: 2pt,
+    )[item]
+  }).join(" ")
 }
